@@ -1,187 +1,221 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PSI trainer</title>
-        <style>
-        * {
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
-        }
+    <style>
+      * {
+        box-sizing: border-box;
+        user-select: none;
+        -webkit-user-select: none;
+      }
 
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #0b0c10;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: sans-serif;
-        }
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #0b0c10;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: sans-serif;
+      }
 
-        /* Пространство поля */
-        .field {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            perspective: 1000px; /* Дает 3D-глубину для переворота */
-        }
+      /* Пространство поля */
+      .field {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        perspective: 1000px; /* Дает 3D-глубину для переворота */
+      }
 
-        /* Контейнер объекта (отвечает за перемещение) */
-        .card-container {
-            position: absolute;
-            width: 160px;
-            height: 240px;
-            left: calc(50% - 80px);
-            top: calc(50% - 120px);
-            cursor: grab;
-            touch-action: none; /* Отключает стандартный скролл браузера при таскании */
-            will-change: transform;
-        }
+      /* Контейнер объекта (отвечает за перемещение) */
+      .card-container {
+        position: absolute;
+        width: 160px;
+        height: 240px;
+        left: calc(50% - 80px);
+        top: calc(50% - 120px);
+        cursor: grab;
+        touch-action: none; /* Отключает стандартный скролл браузера при таскании */
+        will-change: transform;
+      }
 
-        .card-container:active {
-            cursor: grabbing;
-        }
+      .card-container:active {
+        cursor: grabbing;
+      }
 
-        /* Физическое тело карты (отвечает за 3D переворот) */
-        .card-body {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            transform-style: preserve-3d;
-            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
+      /* Физическое тело карты (отвечает за 3D переворот) */
+      .card-body {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transform-style: preserve-3d;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
 
-        /* Состояние перевернутой карты */
-        .card-container.flipped .card-body {
-            transform: rotateY(180deg);
-        }
+      /* Состояние перевернутой карты */
+      .card-container.flipped .card-body {
+        transform: rotateY(180deg);
+      }
 
-        /* Общие свойства для сторон карты */
-        .card-side {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden; /* Скрывает изнанку при развороте */
-            border-radius: 12px;
-            border: 2px solid #1f2833;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
+      /* Общие свойства для сторон карты */
+      .card-side {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden; /* Скрывает изнанку при развороте */
+        border-radius: 12px;
+        border: 2px solid #1f2833;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
 
-        /* Рубашка карты (внешняя сторона) */
-        .card-back {
-            background: linear-gradient(135deg, #1f2833 0%, #0b0c10 100%);
-            color: #66fcf1;
-            /* Сакральная геометрия рубашки */
-            background-image: 
-                radial-gradient(circle, transparent 20%, #0b0c10 20%, #0b0c10 80%, transparent 80%, transparent),
-                radial-gradient(circle, transparent 20%, #0b0c10 20%, #0b0c10 80%, transparent 80%, transparent);
-            background-size: 20px 20px;
-            background-position: 0 0, 10px 10px;
-        }
+      /* Рубашка карты (внешняя сторона) */
+      .card-back {
+        background: linear-gradient(135deg, #1f2833 0%, #0b0c10 100%);
+        color: #66fcf1;
+        /* Сакральная геометрия рубашки */
+        background-image:
+          radial-gradient(
+            circle,
+            transparent 20%,
+            #0b0c10 20%,
+            #0b0c10 80%,
+            transparent 80%,
+            transparent
+          ),
+          radial-gradient(
+            circle,
+            transparent 20%,
+            #0b0c10 20%,
+            #0b0c10 80%,
+            transparent 80%,
+            transparent
+          );
+        background-size: 20px 20px;
+        background-position:
+          0 0,
+          10px 10px;
+      }
 
-        .card-back::after {
-            content: "✦";
-            font-size: 2rem;
-            opacity: 0.5;
-        }
+      .card-back::after {
+        content: "✦";
+        font-size: 2rem;
+        opacity: 0.5;
+      }
 
-        /* Лицо карты (Информационный слепок / Графема) */
-        .card-front {
-            background-color: #1f2833;
-            color: #66fcf1;
-            transform: rotateY(180deg); /* Изначально развернута внутрь */
-            padding: 20px;
-            text-align: center;
-        }
+      /* Лицо карты (Информационный слепок / Графема) */
+      .card-front {
+        background-color: #1f2833;
+        color: #66fcf1;
+        transform: rotateY(180deg); /* Изначально развернута внутрь */
+        padding: 20px;
+        text-align: center;
+      }
 
-        /* Символ Зенера (Волна) */
-        .zener-waves {
-            font-size: 4rem;
-            line-height: 1;
-            margin-bottom: 20px;
-            letter-spacing: -5px;
-        }
+      /* Символ Зенера (Волна) */
+      .zener-waves {
+        font-size: 4rem;
+        line-height: 1;
+        margin-bottom: 20px;
+        letter-spacing: -5px;
+      }
 
-        .card-title {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            opacity: 0.8;
-        }
+      .card-title {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        opacity: 0.8;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <header>
+      <nav></nav>
+    </header>
+    <main>
+      <section class="col-left"></section>
+      <section class="col-centr">
         <div class="field">
-        <div class="card-container" id="draggableCard" tabindex="0" role="button" aria-label="Карта - переверните после проверки">
+          <div
+            class="card-container"
+            id="draggableCard"
+            tabindex="0"
+            role="button"
+            aria-label="Карта - переверните после проверки"
+          >
             <div class="card-body">
-                <!-- Рубашка (смотрит на пользователя) -->
-                <div class="card-side card-back"></div>
-                <!-- Графема (скрыта в памяти, лежит снизу) -->
-                <div class="card-side card-front">
-                    <div class="zener-waves">≈≈≈</div>
-                    <div class="card-title">Волновой Профиль / Wave Profile</div>
-                </div>
+              <!-- Рубашка (смотрит на пользователя) -->
+              <div class="card-side card-back"></div>
+              <!-- Графема (скрыта в памяти, лежит снизу) -->
+              <div class="card-side card-front">
+                <div class="zener-waves">≈≈≈</div>
+                <div class="card-title">Волновой Профиль / Wave Profile</div>
+              </div>
             </div>
+          </div>
         </div>
-    </div>
+      </section>
+      <section class="col-right"></section>
+    </main>
+    <footer></footer>
 
-        <script>
-        const card = document.getElementById('draggableCard');
-        
-        // Вектора состояния объекта в памяти
-        let isDragging = false;
-        let startX = 0, startY = 0;
-        let currentX = 0, currentY = 0;
-        let hasMoved = false; // Отслеживаем, было ли это таскание или просто клик
+    <script>
+      const card = document.getElementById("draggableCard");
 
-        // Точка входа: Считывающий касается карты
-        card.addEventListener('pointerdown', (e) => {
-            isDragging = true;
-            hasMoved = false;
-            
-            // Расчет стартовой дельты с учетом уже имеющегося смещения
-            startX = e.clientX - currentX;
-            startY = e.clientY - currentY;
-            
-            card.setPointerCapture(e.pointerId);
-        });
+      // Вектора состояния объекта в памяти
+      let isDragging = false;
+      let startX = 0,
+        startY = 0;
+      let currentX = 0,
+        currentY = 0;
+      let hasMoved = false; // Отслеживаем, было ли это таскание или просто клик
 
-        // Процесс перемещения волнового слепка по координатной сетке
-        card.addEventListener('pointermove', (e) => {
-            if (!isDragging) return;
-            
-            hasMoved = true;
-            
-            currentX = e.clientX - startX;
-            currentY = e.clientY - startY;
-            
-            // Мгновенная проекция на GPU через аппаратные векторы
-            card.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
-        });
+      // Точка входа: Считывающий касается карты
+      card.addEventListener("pointerdown", (e) => {
+        isDragging = true;
+        hasMoved = false;
 
-        // Фиксация позиции в пространстве
-        card.addEventListener('pointerup', (e) => {
-            if (!isDragging) return;
-            isDragging = false;
-            card.releasePointerCapture(e.pointerId);
+        // Расчет стартовой дельты с учетом уже имеющегося смещения
+        startX = e.clientX - currentX;
+        startY = e.clientY - currentY;
 
-            // Если Считывающий просто нажал на карту (не двигал её) — переворачиваем
-            if (!hasMoved) {
-                card.classList.toggle('flipped');
-            }
-        });
+        card.setPointerCapture(e.pointerId);
+      });
+
+      // Процесс перемещения волнового слепка по координатной сетке
+      card.addEventListener("pointermove", (e) => {
+        if (!isDragging) return;
+
+        hasMoved = true;
+
+        currentX = e.clientX - startX;
+        currentY = e.clientY - startY;
+
+        // Мгновенная проекция на GPU через аппаратные векторы
+        card.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+      });
+
+      // Фиксация позиции в пространстве
+      card.addEventListener("pointerup", (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        card.releasePointerCapture(e.pointerId);
+
+        // Если Считывающий просто нажал на карту (не двигал её) — переворачиваем
+        if (!hasMoved) {
+          card.classList.toggle("flipped");
+        }
+      });
     </script>
-    
-</body>
+  </body>
 </html>
